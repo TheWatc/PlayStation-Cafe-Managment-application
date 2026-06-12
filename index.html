@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PS Cafe Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c14;
+  --bg2: #0f1220;
+  --bg3: #141828;
+  --bg4: #1a2035;
+  --card: #111523;
+  --border: #1e2540;
+  --border2: #2a3560;
+  --accent: #2563eb;
+  --accent2: #3b82f6;
+  --accent-glow: rgba(37,99,235,0.3);
+  --green: #10b981;
+  --green-dim: rgba(16,185,129,0.15);
+  --red: #ef4444;
+  --red-dim: rgba(239,68,68,0.15);
+  --yellow: #f59e0b;
+  --yellow-dim: rgba(245,158,11,0.15);
+  --purple: #8b5cf6;
+  --purple-dim: rgba(139,92,246,0.15);
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --shadow: 0 4px 24px rgba(0,0,0,0.5);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Exo 2', sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* HEADER */
+.header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-logo {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent2);
+  letter-spacing: 2px;
+  display: flex; align-items: center; gap: 10px;
+}
+.header-logo span { color: var(--text); }
+.header-nav { display: flex; gap: 4px; }
+.nav-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text2);
+  padding: 7px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: 'Exo 2', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.nav-btn:hover { background: var(--bg4); color: var(--text); border-color: var(--border); }
+.nav-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.header-kasa {
+  display: flex; gap: 16px; align-items: center;
+}
+.kasa-item {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  display: flex; flex-direction: column; align-items: flex-end;
+}
+.kasa-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; }
+.kasa-value { font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; color: var(--green); }
+
+/* MAIN LAYOUT */
+.main { display: flex; height: calc(100vh - 56px); }
+.sidebar {
+  width: 220px; min-width: 220px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 16px 0;
+  overflow-y: auto;
+}
+.sidebar-section { margin-bottom: 8px; }
+.sidebar-title {
+  font-size: 10px; font-weight: 600; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 1.5px;
+  padding: 4px 16px 8px;
+}
+.sidebar-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px;
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+}
+.sidebar-item:hover { background: var(--bg4); color: var(--text); }
+.sidebar-item.active { background: var(--bg4); color: var(--accent2); border-left-color: var(--accent2); }
+.sidebar-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* CONTENT */
+.content { flex: 1; overflow-y: auto; padding: 20px; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* PAGE HEADER */
+.page-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 26px; font-weight: 700;
+  color: var(--text);
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-title .badge {
+  font-size: 12px; font-weight: 600;
+  padding: 3px 10px; border-radius: 20px;
+  font-family: 'Exo 2', sans-serif;
+}
+
+/* MASA GRID */
+.masa-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+}
+.masa-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+.masa-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--border2);
+  transition: all 0.2s;
+}
+.masa-card.acik::before { background: var(--green); }
+.masa-card.acik { border-color: rgba(16,185,129,0.3); }
+.masa-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.masa-card.acik:hover { box-shadow: 0 4px 24px rgba(16,185,129,0.15); }
+.masa-no {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 28px; font-weight: 700;
+  color: var(--text3);
+  line-height: 1;
+}
+.masa-card.acik .masa-no { color: var(--text); }
+.masa-status-badge {
+  display: inline-block;
+  font-size: 10px; font-weight: 600;
+  padding: 3px 8px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+.badge-kapali { background: var(--bg4); color: var(--text3); }
+.badge-acik { background: var(--green-dim); color: var(--green); }
+.badge-sureli { background: var(--purple-dim); color: var(--purple); }
+.masa-kol { font-size: 12px; color: var(--text3); margin-bottom: 4px; }
+.masa-card.acik .masa-kol { color: var(--text2); }
+.masa-sure { 
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 20px; font-weight: 600;
+  color: var(--accent2);
+}
+.masa-ucret {
+  font-size: 13px; font-weight: 600; color: var(--yellow);
+  margin-top: 4px;
+}
+.masa-tip { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.masa-adisyon-badge {
+  position: absolute; top: 10px; right: 10px;
+  background: var(--yellow-dim);
+  color: var(--yellow);
+  font-size: 10px; font-weight: 600;
+  padding: 2px 7px; border-radius: 10px;
+  border: 1px solid rgba(245,158,11,0.3);
+}
+
+/* CONTEXT MENU */
+.ctx-menu {
+  position: fixed;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 6px;
+  z-index: 1000;
+  min-width: 190px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  animation: ctxIn 0.12s ease;
+}
+@keyframes ctxIn { from { opacity:0; transform: scale(0.95); } to { opacity:1; transform: scale(1); } }
+.ctx-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 13px; font-weight: 500;
+  transition: all 0.1s;
+}
+.ctx-item:hover { background: var(--bg4); color: var(--text); }
+.ctx-item.danger:hover { background: var(--red-dim); color: var(--red); }
+.ctx-item.success:hover { background: var(--green-dim); color: var(--green); }
+.ctx-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+.ctx-divider { height: 1px; background: var(--border); margin: 4px 0; }
+.ctx-masa-title {
+  padding: 8px 12px 4px;
+  font-size: 11px; font-weight: 600;
+  color: var(--text3); text-transform: uppercase; letter-spacing: 1px;
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 500;
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.15s ease;
+}
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 28px;
+  min-width: 400px;
+  max-width: 520px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  animation: slideUp 0.2s ease;
+}
+@keyframes slideUp { from { transform: translateY(20px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+.modal-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 20px; font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--text);
+  display: flex; align-items: center; gap: 10px;
+}
+.modal-close {
+  margin-left: auto; background: none; border: none;
+  color: var(--text3); cursor: pointer; padding: 4px;
+  border-radius: 4px; transition: color 0.15s;
+}
+.modal-close:hover { color: var(--red); }
+.form-row { margin-bottom: 16px; }
+.form-label { font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; display: block; }
+.form-input, .form-select {
+  width: 100%; background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  padding: 10px 14px;
+  font-family: 'Exo 2', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus, .form-select:focus { border-color: var(--accent2); }
+.form-select option { background: var(--bg3); }
+.kol-selector { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
+.kol-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  color: var(--text2);
+  padding: 10px;
+  cursor: pointer;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 18px; font-weight: 700;
+  text-align: center;
+  transition: all 0.15s;
+}
+.kol-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+.kol-btn.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-row { display: flex; gap: 10px; margin-top: 20px; }
+.btn {
+  flex: 1; padding: 11px 20px;
+  border-radius: var(--radius-sm);
+  font-family: 'Exo 2', sans-serif;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; border: 1px solid transparent;
+  transition: all 0.15s;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-secondary { background: var(--bg4); color: var(--text2); border-color: var(--border2); }
+.btn-secondary:hover { background: var(--bg3); color: var(--text); }
+.btn-danger { background: var(--red-dim); color: var(--red); border-color: rgba(239,68,68,0.3); }
+.btn-danger:hover { background: var(--red); color: #fff; }
+.btn-success { background: var(--green-dim); color: var(--green); border-color: rgba(16,185,129,0.3); }
+.btn-success:hover { background: var(--green); color: #fff; }
+
+/* HESAP KES MODAL */
+.hesap-summary {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.hesap-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.hesap-row:last-child { border-bottom: none; }
+.hesap-row.total {
+  font-weight: 700; font-size: 16px;
+  color: var(--yellow);
+  padding-top: 10px; margin-top: 4px;
+}
+.hesap-row .label { color: var(--text2); }
+.hesap-row .value { color: var(--text); font-weight: 600; }
+
+/* FIYATLANDIRMA PAGE */
+.fiyat-masa-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+.fiyat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.fiyat-card-header {
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.fiyat-card-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 18px; font-weight: 700;
+}
+.fiyat-card-body { padding: 16px; }
+.fiyat-kol-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px;
+}
+.fiyat-kol-label {
+  width: 80px; font-size: 12px; font-weight: 600; color: var(--text3);
+}
+.fiyat-input {
+  flex: 1; background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 7px 12px;
+  font-family: 'Exo 2', sans-serif;
+  font-size: 13px; outline: none;
+  transition: border-color 0.2s;
+}
+.fiyat-input:focus { border-color: var(--accent2); }
+.fiyat-unit { font-size: 11px; color: var(--text3); white-space: nowrap; }
+.save-btn {
+  width: 100%;
+  background: var(--accent);
+  border: none; border-radius: 6px;
+  color: #fff;
+  padding: 8px;
+  font-family: 'Exo 2', sans-serif;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.15s;
+}
+.save-btn:hover { background: var(--accent2); }
+
+/* ADİSYON PAGE */
+.adisyon-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.adisyon-add-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.adisyon-list-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.adisyon-item {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+}
+.adisyon-item-name { font-weight: 500; }
+.adisyon-item-price { color: var(--yellow); font-weight: 600; font-family: 'Rajdhani', sans-serif; font-size: 16px; }
+.adisyon-item-del {
+  background: none; border: none;
+  color: var(--text3); cursor: pointer;
+  padding: 4px; border-radius: 4px;
+  transition: color 0.15s;
+}
+.adisyon-item-del:hover { color: var(--red); }
+
+/* LOG PAGE */
+.log-container { max-width: 900px; }
+.log-filters {
+  display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;
+}
+.log-filter-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text2);
+  padding: 6px 14px;
+  font-size: 12px; font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'Exo 2', sans-serif;
+}
+.log-filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.log-item {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 12px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  transition: border-color 0.2s;
+}
+.log-item:hover { border-color: var(--border2); }
+.log-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+.log-body { flex: 1; min-width: 0; }
+.log-text { font-size: 13px; color: var(--text); margin-bottom: 3px; }
+.log-time { font-size: 11px; color: var(--text3); }
+.log-masa-badge {
+  font-size: 10px; font-weight: 600; padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--bg4); color: var(--text2);
+  white-space: nowrap;
+}
+
+/* KASA PAGE */
+.kasa-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.kasa-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.kasa-card-label { font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.kasa-card-value {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 36px; font-weight: 700;
+  color: var(--green);
+}
+.kasa-card-sub { font-size: 12px; color: var(--text3); margin-top: 4px; }
+.kasa-table {
+  width: 100%; border-collapse: collapse;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.kasa-table th {
+  background: var(--bg3);
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px; font-weight: 600;
+  color: var(--text3); text-transform: uppercase; letter-spacing: 1px;
+  border-bottom: 1px solid var(--border);
+}
+.kasa-table td {
+  padding: 10px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.kasa-table tr:last-child td { border-bottom: none; }
+.kasa-table td.amount { color: var(--green); font-weight: 600; font-family: 'Rajdhani', sans-serif; font-size: 15px; }
+
+/* TOAST */
+.toast-container {
+  position: fixed; bottom: 20px; right: 20px;
+  z-index: 9999; display: flex; flex-direction: column; gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+  color: var(--text);
+  font-size: 13px;
+  box-shadow: var(--shadow);
+  animation: toastIn 0.2s ease;
+  display: flex; align-items: center; gap: 10px;
+  max-width: 320px;
+}
+@keyframes toastIn { from { transform: translateX(100%); opacity:0; } to { transform: translateX(0); opacity:1; } }
+.toast.success { border-left: 3px solid var(--green); }
+.toast.error { border-left: 3px solid var(--red); }
+.toast.info { border-left: 3px solid var(--accent2); }
+
+/* SÜRELI MODAL */
+.sure-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.sure-opt {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+  font-weight: 600;
+  color: var(--text2);
+  transition: all 0.15s;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+}
+.sure-opt:hover { border-color: var(--purple); color: var(--purple); }
+.sure-opt.selected { background: var(--purple-dim); border-color: var(--purple); color: var(--purple); }
+
+/* ADISYON EKLE MODAL */
+.adisyon-modal-list { max-height: 200px; overflow-y: auto; margin-bottom: 10px; }
+.adisyon-modal-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.adisyon-modal-item:hover { background: var(--bg4); }
+.adisyon-modal-item .aname { font-size: 13px; }
+.adisyon-modal-item .aprice { font-family: 'Rajdhani', sans-serif; font-size: 15px; color: var(--yellow); }
+
+/* MASA DEGISTIR */
+.masa-degistir-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+}
+.masa-degistir-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  color: var(--text2);
+  padding: 10px;
+  cursor: pointer;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px; font-weight: 700;
+  text-align: center;
+  transition: all 0.15s;
+}
+.masa-degistir-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+.masa-degistir-btn.disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* TABLE COUNT IN HEADER */
+.masa-count-pill {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 12px; color: var(--text2);
+  display: flex; align-items: center; gap: 6px;
+}
+.masa-count-pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+
+/* RESPONSIVE MASA GRID */
+@media (max-width: 900px) {
+  .masa-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .adisyon-container { grid-template-columns: 1fr; }
+  .kasa-cards { grid-template-columns: 1fr; }
+}
+
+/* SAĞ PANEL - ADİSYON DETAY */
+.detail-panel {
+  position: fixed; right: 0; top: 56px; bottom: 0;
+  width: 300px; background: var(--bg2);
+  border-left: 1px solid var(--border);
+  padding: 20px;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  z-index: 90; overflow-y: auto;
+}
+.detail-panel.open { transform: translateX(0); }
+.detail-panel-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 18px; font-weight: 700; margin-bottom: 16px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.detail-close {
+  background: none; border: none; color: var(--text3);
+  cursor: pointer; padding: 4px;
+}
+.detail-close:hover { color: var(--red); }
+.detail-row {
+  display: flex; justify-content: space-between;
+  padding: 7px 0; border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.detail-row:last-child { border-bottom: none; }
+.detail-row .label { color: var(--text2); }
+.detail-row .value { font-weight: 600; }
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center; padding: 48px 20px;
+  color: var(--text3);
+}
+.empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.4; }
+.empty-state h3 { font-size: 16px; color: var(--text2); margin-bottom: 6px; }
+.empty-state p { font-size: 13px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M7 12h2M9 10v4"/><circle cx="15" cy="12" r="1"/><circle cx="17" cy="10" r="1"/><circle cx="17" cy="14" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+    PS<span>CAFE</span>
+  </div>
+  <div class="header-nav">
+    <button class="nav-btn active" onclick="showPage('masalar')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Masalar
+    </button>
+    <button class="nav-btn" onclick="showPage('fiyatlar')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Fiyatlar
+    </button>
+    <button class="nav-btn" onclick="showPage('adisyon')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+      Adisyon
+    </button>
+    <button class="nav-btn" onclick="showPage('kasa')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+      Kasa
+    </button>
+    <button class="nav-btn" onclick="showPage('log')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+      Log
+    </button>
+  </div>
+  <div class="header-kasa">
+    <div class="masa-count-pill">
+      <div class="dot"></div>
+      <span id="acik-masa-count">0</span> Masa Açık
+    </div>
+    <div class="kasa-item">
+      <span class="kasa-label">Anlık Kasa</span>
+      <span class="kasa-value" id="header-anlik">₺0</span>
+    </div>
+    <div class="kasa-item">
+      <span class="kasa-label">Günlük Kasa</span>
+      <span class="kasa-value" id="header-gunluk">₺0</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- CONTENT -->
+  <div class="content" id="main-content">
+
+    <!-- MASALAR PAGE -->
+    <div class="page active" id="page-masalar">
+      <div class="page-title">
+        Masalar
+        <button onclick="openMasaEkleModal()" style="margin-left:auto; background:var(--accent); border:none; border-radius:8px; color:#fff; padding:8px 18px; font-family:'Exo 2',sans-serif; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Masa Ekle
+        </button>
+      </div>
+      <div class="masa-grid" id="masa-grid"></div>
+    </div>
+
+    <!-- FİYATLAR PAGE -->
+    <div class="page" id="page-fiyatlar">
+      <div class="page-title">Fiyatlandırma</div>
+      <div class="fiyat-masa-grid" id="fiyat-masa-grid"></div>
+    </div>
+
+    <!-- ADİSYON PAGE -->
+    <div class="page" id="page-adisyon">
+      <div class="page-title">Adisyon Menüsü</div>
+      <div class="adisyon-container">
+        <div class="adisyon-add-card">
+          <div style="font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; margin-bottom:16px; color:var(--text);">Yeni Ürün Ekle</div>
+          <div class="form-row">
+            <label class="form-label">Ürün Adı</label>
+            <input type="text" class="form-input" id="adisyon-isim" placeholder="Kola, Çay, Sandviç...">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Fiyat (₺)</label>
+            <input type="number" class="form-input" id="adisyon-fiyat" placeholder="0.00" step="0.01" min="0">
+          </div>
+          <button class="btn btn-primary" style="width:100%" onclick="adisyonEkle()">Ekle</button>
+        </div>
+        <div class="adisyon-list-card">
+          <div style="font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; margin-bottom:16px; color:var(--text);">Ürün Listesi</div>
+          <div id="adisyon-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KASA PAGE -->
+    <div class="page" id="page-kasa">
+      <div class="page-title">Kasa Raporu</div>
+      <div class="kasa-cards">
+        <div class="kasa-card">
+          <div class="kasa-card-label">Anlık Kasa (Açık Masalar)</div>
+          <div class="kasa-card-value" id="kasa-anlik-val">₺0</div>
+          <div class="kasa-card-sub" id="kasa-anlik-sub">0 masa açık</div>
+        </div>
+        <div class="kasa-card">
+          <div class="kasa-card-label">Günlük Kasa (Kesilmiş Hesaplar)</div>
+          <div class="kasa-card-value" id="kasa-gunluk-val">₺0</div>
+          <div class="kasa-card-sub" id="kasa-gunluk-sub">0 hesap kesildi</div>
+        </div>
+      </div>
+      <div style="font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">Günlük İşlemler</div>
+      <table class="kasa-table">
+        <thead>
+          <tr>
+            <th>Saat</th>
+            <th>Masa</th>
+            <th>Süre</th>
+            <th>Kol</th>
+            <th>Açıklama</th>
+            <th>Tutar</th>
+          </tr>
+        </thead>
+        <tbody id="kasa-table-body">
+          <tr><td colspan="6" style="text-align:center; color:var(--text3); padding:24px">Bugün henüz hesap kesilmedi</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- LOG PAGE -->
+    <div class="page" id="page-log">
+      <div class="page-title">Sistem Kayıtları</div>
+      <div class="log-filters">
+        <button class="log-filter-btn active" onclick="filterLog('all', this)">Tümü</button>
+        <button class="log-filter-btn" onclick="filterLog('open', this)">Açılış</button>
+        <button class="log-filter-btn" onclick="filterLog('close', this)">Kapanış</button>
+        <button class="log-filter-btn" onclick="filterLog('adisyon', this)">Adisyon</button>
+        <button class="log-filter-btn" onclick="filterLog('fiyat', this)">Fiyat</button>
+        <button class="log-filter-btn" onclick="filterLog('free', this)">Ücretsiz</button>
+        <button class="log-filter-btn" onclick="filterLog('move', this)">Masa Değişim</button>
+        <button class="log-filter-btn danger" onclick="clearLog()" style="margin-left:auto; color:var(--red);">Temizle</button>
+      </div>
+      <div class="log-container">
+        <div id="log-list"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CONTEXT MENU -->
+<div class="ctx-menu" id="ctx-menu" style="display:none"></div>
+
+<!-- MODALS CONTAINER -->
+<div id="modals"></div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  masalar: [],
+  adisyonlar: [],
+  fiyatlar: {}, // { masaId: { 1: { saat: fiyat, acKapa: fiyat }, ... } }
+  log: [],
+  gunlukKasa: 0,
+  gunlukIslemler: [],
+  currentPage: 'masalar'
+};
+
+const MASA_SAYISI_DEFAULT = 8;
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('pscafe_state');
+    if (s) {
+      const parsed = JSON.parse(s);
+      state = { ...state, ...parsed };
+      // Restore timer intervals
+      state.masalar.forEach(m => {
+        if (m.acik && m.acilis) m.acilis = new Date(m.acilis).getTime();
+      });
+    } else {
+      // Default masalar
+      for (let i = 1; i <= MASA_SAYISI_DEFAULT; i++) {
+        state.masalar.push(createMasa(i));
+        state.fiyatlar[i] = { 1: { saat: 100, acKapa: 100 }, 2: { saat: 170, acKapa: 170 }, 3: { saat: 250, acKapa: 250 }, 4: { saat: 320, acKapa: 320 } };
+      }
+    }
+  } catch(e) { console.error(e); }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem('pscafe_state', JSON.stringify(state));
+  } catch(e) {}
+}
+
+function createMasa(no) {
+  return {
+    id: no,
+    no: no,
+    acik: false,
+    tip: null, // 'suresiz' | 'sureli'
+    kol: 2,
+    acilis: null,
+    sure: null, // dakika (süreli için)
+    adisyonlar: [],
+    ucret: 0
+  };
+}
+
+// ============================================================
+// TIMER
+// ============================================================
+let timerInterval = null;
+function startTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    renderMasaGrid();
+    updateKasaHeader();
+  }, 10000); // 10 saniyede bir güncelle
+}
+
+// ============================================================
+// HESAPLAMA
+// ============================================================
+function getFiyat(masaId, kol) {
+  const f = state.fiyatlar[masaId];
+  if (!f || !f[kol]) return { saat: 0, acKapa: 0 };
+  // Eski format uyumluluğu (sayıysa yeni yapıya çevir)
+  if (typeof f[kol] === 'number') return { saat: f[kol], acKapa: f[kol] };
+  return { saat: f[kol].saat || 0, acKapa: f[kol].acKapa || 0 };
+}
+
+function getSaatlikUcret(masaId, kol) {
+  return getFiyat(masaId, kol).saat;
+}
+
+function calcUcret(masa) {
+  if (!masa.acik || !masa.acilis) return 0;
+  const now = Date.now();
+  const elapsed = Math.floor((now - masa.acilis) / 1000 / 60); // dakika
+  const { saat: saatlikFiyat, acKapa: acKapaFiyat } = getFiyat(masa.id, masa.kol);
+
+  if (masa.tip === 'sureli') {
+    // Süreli: belirlenen süre kadar dakika bazlı, minimum aç/kapa ücreti
+    const sureDk = masa.sure || 60;
+    const gecenDk = Math.min(elapsed, sureDk);
+    const dkFiyat = saatlikFiyat / 60;
+    const hesaplanan = Math.round(gecenDk * dkFiyat);
+    return Math.max(hesaplanan, acKapaFiyat);
+  }
+
+  // Süresiz hesaplama
+  let hesaplanan;
+  if (elapsed <= 60) {
+    const dkFiyat = saatlikFiyat / 60;
+    hesaplanan = Math.round(elapsed * dkFiyat);
+  } else {
+    // 1 saatten fazla: tamamlanan saatlere tam ücret, kalanına dk bazlı
+    const tamSaat = Math.floor(elapsed / 60);
+    const kalanDk = elapsed % 60;
+    const dkFiyat = saatlikFiyat / 60;
+    hesaplanan = Math.round((tamSaat * saatlikFiyat) + (kalanDk * dkFiyat));
+  }
+  // Minimum aç/kapa ücreti
+  return Math.max(hesaplanan, acKapaFiyat);
+}
+
+function calcAdisyonToplam(masa) {
+  return (masa.adisyonlar || []).reduce((s, a) => s + a.fiyat, 0);
+}
+
+function calcToplam(masa) {
+  return calcUcret(masa) + calcAdisyonToplam(masa);
+}
+
+function formatSure(acilis, sureDk) {
+  if (!acilis) return '00:00';
+  const elapsed = Math.floor((Date.now() - acilis) / 1000);
+  if (sureDk) {
+    // Süreli: kalan süre
+    const kalanSn = Math.max(0, sureDk * 60 - elapsed);
+    const m = Math.floor(kalanSn / 60);
+    const s = kalanSn % 60;
+    return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+  const m = Math.floor(elapsed / 60);
+  const s = elapsed % 60;
+  const h = Math.floor(m / 60);
+  const min = m % 60;
+  if (h > 0) return `${h}:${String(min).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function formatMoney(n) {
+  return '₺' + n.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
+function formatDateTime(ts) {
+  const d = new Date(ts);
+  return d.toLocaleTimeString('tr-TR', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+}
+
+// ============================================================
+// RENDER MASALAR
+// ============================================================
+function renderMasaGrid() {
+  const grid = document.getElementById('masa-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  state.masalar.forEach(m => {
+    const card = document.createElement('div');
+    card.className = 'masa-card' + (m.acik ? ' acik' : '');
+    card.dataset.masaId = m.id;
+
+    let innerHtml = '';
+    if (m.acik) {
+      const badgeText = m.tip === 'sureli' ? 'Süreli' : 'Süresiz';
+      const badgeClass = m.tip === 'sureli' ? 'badge-sureli' : 'badge-acik';
+      const ucret = calcUcret(m);
+      const adisyonT = calcAdisyonToplam(m);
+      const toplam = ucret + adisyonT;
+      const sure = formatSure(m.acilis, m.tip === 'sureli' ? m.sure : null);
+      
+      innerHtml = `
+        <div class="masa-no">M${m.no}</div>
+        <div class="masa-status-badge ${badgeClass}">${badgeText}</div>
+        <div class="masa-kol">${m.kol} Kol</div>
+        <div class="masa-sure">${sure}</div>
+        <div class="masa-ucret">${formatMoney(toplam)}</div>
+        ${m.tip === 'suresiz' ? `<div class="masa-tip">${formatMoney(getSaatlikUcret(m.id, m.kol))}/saat · min ${formatMoney(getFiyat(m.id, m.kol).acKapa)}</div>` : `<div class="masa-tip">Kalan süre</div>`}
+        ${adisyonT > 0 ? `<div class="masa-adisyon-badge">+${formatMoney(adisyonT)}</div>` : ''}
+      `;
+    } else {
+      innerHtml = `
+        <div class="masa-no">M${m.no}</div>
+        <div class="masa-status-badge badge-kapali">Kapalı</div>
+        <div class="masa-kol" style="margin-top:8px; font-size:13px">Müsait</div>
+      `;
+    }
+    card.innerHTML = innerHtml;
+    card.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showContextMenu(e, m.id);
+    });
+    card.addEventListener('click', (e) => {
+      if (m.acik) showMasaDetail(m.id);
+    });
+    grid.appendChild(card);
+  });
+  updateKasaHeader();
+}
+
+// ============================================================
+// CONTEXT MENU
+// ============================================================
+function showContextMenu(e, masaId) {
+  closeContextMenu();
+  const masa = state.masalar.find(m => m.id === masaId);
+  if (!masa) return;
+  
+  const menu = document.getElementById('ctx-menu');
+  menu.style.display = 'block';
+  
+  let items = `<div class="ctx-masa-title">Masa ${masa.no}</div>`;
+  
+  if (masa.acik) {
+    items += `
+      <div class="ctx-item success" onclick="hesapKes(${masaId}, false)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14l2 2 4-4"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+        Hesap Kes
+      </div>
+      <div class="ctx-item" onclick="hesapKes(${masaId}, true)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        Ücretsiz Hesap Kes
+      </div>
+      <div class="ctx-divider"></div>
+      <div class="ctx-item" onclick="openAdisyonEkleModal(${masaId})">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M12 11v6M9 14h6"/></svg>
+        Adisyon Ekle
+      </div>
+      <div class="ctx-item" onclick="openMasaDegistirModal(${masaId})">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3M16 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-3M12 3v18"/></svg>
+        Masa Değiştir
+      </div>
+      <div class="ctx-item" onclick="sureliCevir(${masaId})">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        ${masa.tip === 'suresiz' ? 'Süreli Çevir' : 'Süresiz Çevir'}
+      </div>
+    `;
+  } else {
+    items += `
+      <div class="ctx-item success" onclick="openMasaAcModal(${masaId}, 'suresiz')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Süresiz Hesap Aç
+      </div>
+      <div class="ctx-item" onclick="openMasaAcModal(${masaId}, 'sureli')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        Süreli Hesap Aç
+      </div>
+    `;
+  }
+  
+  menu.innerHTML = items;
+  
+  let x = e.clientX, y = e.clientY;
+  if (x + 200 > window.innerWidth) x = window.innerWidth - 210;
+  if (y + menu.offsetHeight + 10 > window.innerHeight) y = y - menu.offsetHeight;
+  menu.style.left = x + 'px';
+  menu.style.top = y + 'px';
+  
+  setTimeout(() => {
+    document.addEventListener('click', closeContextMenu, { once: true });
+  }, 10);
+}
+
+function closeContextMenu() {
+  document.getElementById('ctx-menu').style.display = 'none';
+}
+
+// ============================================================
+// MASA AÇ MODAL
+// ============================================================
+function openMasaAcModal(masaId, tip) {
+  closeContextMenu();
+  const masa = state.masalar.find(m => m.id === masaId);
+  
+  let sureOptions = '';
+  if (tip === 'sureli') {
+    sureOptions = `
+      <div class="form-row">
+        <label class="form-label">Süre Seç</label>
+        <div class="sure-options" id="sure-options">
+          <div class="sure-opt selected" data-sure="30" onclick="selectSure(this)">30 dk</div>
+          <div class="sure-opt" data-sure="60" onclick="selectSure(this)">1 saat</div>
+          <div class="sure-opt" data-sure="90" onclick="selectSure(this)">1.5 saat</div>
+          <div class="sure-opt" data-sure="120" onclick="selectSure(this)">2 saat</div>
+          <div class="sure-opt" data-sure="180" onclick="selectSure(this)">3 saat</div>
+          <div class="sure-opt" data-sure="240" onclick="selectSure(this)">4 saat</div>
+        </div>
+        <input type="number" class="form-input" id="sure-custom" placeholder="Özel süre (dakika)" min="1" style="margin-top:8px">
+      </div>
+    `;
+  }
+  
+  const kolFiyatInfo = [1,2,3,4].map(k => {
+    const kf = getFiyat(masaId, k);
+    return `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:var(--text2)">
+      <span>${k} Kol</span>
+      <span style="display:flex;gap:12px">
+        <span style="color:var(--accent2)">${formatMoney(kf.saat)}/saat</span>
+        <span style="color:var(--yellow)">min. ${formatMoney(kf.acKapa)}</span>
+      </span>
+    </div>`;
+  }).join('');
+  
+  const html = `
+    <div class="modal-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      Masa ${masa.no} - ${tip === 'sureli' ? 'Süreli' : 'Süresiz'} Aç
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Kol Sayısı</label>
+      <div class="kol-selector" id="kol-selector">
+        ${[1,2,3,4].map(k => `<div class="kol-btn ${k===2?'selected':''}" data-kol="${k}" onclick="selectKol(this)">${k}</div>`).join('')}
+      </div>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Bu Masanın Fiyatları</div>
+      ${kolFiyatInfo}
+    </div>
+    ${sureOptions}
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="closeModal()">İptal</button>
+      <button class="btn btn-success" onclick="masaAc(${masaId}, '${tip}')">Aç</button>
+    </div>
+  `;
+  showModal(html);
+}
+
+function selectKol(el) {
+  document.querySelectorAll('.kol-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectSure(el) {
+  document.querySelectorAll('.sure-opt').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('sure-custom').value = '';
+}
+
+function masaAc(masaId, tip) {
+  const kolEl = document.querySelector('.kol-btn.selected');
+  const kol = kolEl ? parseInt(kolEl.dataset.kol) : 2;
+  
+  let sure = null;
+  if (tip === 'sureli') {
+    const sureOptEl = document.querySelector('.sure-opt.selected');
+    const customEl = document.getElementById('sure-custom');
+    if (customEl && customEl.value) {
+      sure = parseInt(customEl.value);
+    } else if (sureOptEl) {
+      sure = parseInt(sureOptEl.dataset.sure);
+    } else {
+      sure = 60;
+    }
+  }
+  
+  const masa = state.masalar.find(m => m.id === masaId);
+  masa.acik = true;
+  masa.tip = tip;
+  masa.kol = kol;
+  masa.acilis = Date.now();
+  masa.sure = sure;
+  masa.adisyonlar = [];
+  
+  addLog('open', `Masa ${masa.no} açıldı — ${tip === 'sureli' ? `Süreli (${sure} dk)` : 'Süresiz'}, ${kol} kol`, masaId);
+  saveState();
+  closeModal();
+  renderMasaGrid();
+  renderFiyatlar();
+  showToast(`Masa ${masa.no} açıldı!`, 'success');
+}
+
+// ============================================================
+// HESAP KES
+// ============================================================
+function hesapKes(masaId, ucretsiz) {
+  closeContextMenu();
+  const masa = state.masalar.find(m => m.id === masaId);
+  
+  const elapsed = masa.acilis ? Math.floor((Date.now() - masa.acilis) / 1000 / 60) : 0;
+  const ucret = ucretsiz ? 0 : calcUcret(masa);
+  const adisyonT = calcAdisyonToplam(masa);
+  const toplam = ucret + adisyonT;
+  const saat = Math.floor(elapsed / 60);
+  const dk = elapsed % 60;
+  const sureStr = saat > 0 ? `${saat} saat ${dk} dk` : `${dk} dk`;
+  
+  const adisyonRows = (masa.adisyonlar || []).map(a =>
+    `<div class="hesap-row"><span class="label">${a.isim}</span><span class="value">${formatMoney(a.fiyat)}</span></div>`
+  ).join('');
+  
+  const html = `
+    <div class="modal-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="2"><path d="M9 14l2 2 4-4"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      Hesap Kes — Masa ${masa.no}
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="hesap-summary">
+      <div class="hesap-row"><span class="label">Süre</span><span class="value">${sureStr}</span></div>
+      <div class="hesap-row"><span class="label">Kol</span><span class="value">${masa.kol} Kol</span></div>
+      <div class="hesap-row"><span class="label">Oyun Ücreti</span><span class="value" style="color:var(--accent2)">${ucretsiz ? '₺0 (Ücretsiz)' : formatMoney(ucret)}</span></div>
+      ${adisyonRows}
+      <div class="hesap-row total"><span class="label">TOPLAM</span><span class="value">${formatMoney(toplam)}</span></div>
+    </div>
+    ${ucretsiz ? '<div style="background:var(--yellow-dim);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--yellow);margin-bottom:16px">⚠ Bu hesap ücretsiz kesilecek. Adisyon tutarı da 0 olarak işlenecek.</div>' : ''}
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="closeModal()">İptal</button>
+      <button class="btn ${ucretsiz ? 'btn-secondary' : 'btn-success'}" onclick="hesapKesOnay(${masaId}, ${ucretsiz})">Hesabı Kes</button>
+    </div>
+  `;
+  showModal(html);
+}
+
+function hesapKesOnay(masaId, ucretsiz) {
+  const masa = state.masalar.find(m => m.id === masaId);
+  const elapsed = masa.acilis ? Math.floor((Date.now() - masa.acilis) / 1000 / 60) : 0;
+  const ucret = ucretsiz ? 0 : calcUcret(masa);
+  const adisyonT = ucretsiz ? 0 : calcAdisyonToplam(masa);
+  const toplam = ucret + adisyonT;
+  const saat = Math.floor(elapsed / 60);
+  const dk = elapsed % 60;
+  const sureStr = saat > 0 ? `${saat} saat ${dk} dk` : `${dk} dk`;
+  
+  state.gunlukKasa += toplam;
+  state.gunlukIslemler.push({
+    ts: Date.now(),
+    masaNo: masa.no,
+    sure: sureStr,
+    kol: masa.kol,
+    tip: ucretsiz ? 'Ücretsiz' : masa.tip === 'sureli' ? 'Süreli' : 'Süresiz',
+    toplam: toplam,
+    adisyonlar: [...(masa.adisyonlar || [])]
+  });
+  
+  addLog(ucretsiz ? 'free' : 'close', 
+    `Masa ${masa.no} hesabı kesildi — ${ucretsiz ? 'ÜCRETSİZ' : formatMoney(toplam)} (${sureStr}, ${masa.kol} kol)`, 
+    masaId);
+  
+  masa.acik = false;
+  masa.tip = null;
+  masa.kol = 2;
+  masa.acilis = null;
+  masa.sure = null;
+  masa.adisyonlar = [];
+  
+  saveState();
+  closeModal();
+  renderMasaGrid();
+  renderFiyatlar();
+  renderKasa();
+  showToast(`Masa ${masa.no} hesabı kesildi!`, ucretsiz ? 'info' : 'success');
+}
+
+// ============================================================
+// ADİSYON EKLE MODAL (Masaya)
+// ============================================================
+function openAdisyonEkleModal(masaId) {
+  closeContextMenu();
+  const masa = state.masalar.find(m => m.id === masaId);
+  
+  const listHtml = state.adisyonlar.length === 0 
+    ? '<div style="color:var(--text3);font-size:13px;padding:12px;text-align:center">Menüde ürün yok. Önce adisyon menüsünden ürün ekleyin.</div>'
+    : state.adisyonlar.map(a => `
+        <div class="adisyon-modal-item" onclick="masayaAdisyonEkle(${masaId}, '${a.id}')">
+          <span class="aname">${a.isim}</span>
+          <span class="aprice">${formatMoney(a.fiyat)}</span>
+        </div>
+      `).join('');
+  
+  const mevcutHtml = (masa.adisyonlar || []).length > 0
+    ? `<div style="margin-top:16px; border-top:1px solid var(--border); padding-top:12px">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Mevcut Adisyonlar</div>
+        ${masa.adisyonlar.map((a,i) => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
+            <span style="color:var(--text2)">${a.isim}</span>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="color:var(--yellow);font-weight:600">${formatMoney(a.fiyat)}</span>
+              <button onclick="masadanAdisyonSil(${masaId}, ${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:16px;">×</button>
+            </div>
+          </div>
+        `).join('')}
+        <div style="display:flex;justify-content:flex-end;margin-top:8px;font-weight:700;color:var(--yellow)">Toplam: ${formatMoney(calcAdisyonToplam(masa))}</div>
+      </div>`
+    : '';
+  
+  const html = `
+    <div class="modal-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent2)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M12 11v6M9 14h6"/></svg>
+      Adisyon Ekle — Masa ${masa.no}
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Menü</div>
+    <div class="adisyon-modal-list" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:4px">
+      ${listHtml}
+    </div>
+    ${mevcutHtml}
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn btn-secondary" onclick="closeModal()">Kapat</button>
+    </div>
+  `;
+  showModal(html);
+}
+
+function masayaAdisyonEkle(masaId, adisyonId) {
+  const masa = state.masalar.find(m => m.id === masaId);
+  const adisyon = state.adisyonlar.find(a => a.id === adisyonId);
+  if (!masa || !adisyon) return;
+  
+  if (!masa.adisyonlar) masa.adisyonlar = [];
+  masa.adisyonlar.push({ isim: adisyon.isim, fiyat: adisyon.fiyat, ts: Date.now() });
+  
+  addLog('adisyon', `Masa ${masa.no}'ye adisyon eklendi: ${adisyon.isim} (${formatMoney(adisyon.fiyat)})`, masaId);
+  saveState();
+  closeModal();
+  openAdisyonEkleModal(masaId);
+  renderMasaGrid();
+  showToast(`${adisyon.isim} eklendi`, 'info');
+}
+
+function masadanAdisyonSil(masaId, index) {
+  const masa = state.masalar.find(m => m.id === masaId);
+  if (!masa || !masa.adisyonlar) return;
+  const adisyon = masa.adisyonlar[index];
+  addLog('adisyon', `Masa ${masa.no}'den adisyon silindi: ${adisyon.isim}`, masaId);
+  masa.adisyonlar.splice(index, 1);
+  saveState();
+  closeModal();
+  openAdisyonEkleModal(masaId);
+  renderMasaGrid();
+}
+
+// ============================================================
+// MASA DEĞİŞTİR
+// ============================================================
+function openMasaDegistirModal(masaId) {
+  closeContextMenu();
+  const masa = state.masalar.find(m => m.id === masaId);
+  
+  const btns = state.masalar.map(m => {
+    if (m.id === masaId) return '';
+    const disabled = m.acik ? 'disabled' : '';
+    return `<div class="masa-degistir-btn ${disabled}" onclick="${disabled ? '' : `masaDegistir(${masaId}, ${m.id})`}" title="${m.acik ? 'Masa açık' : ''}">M${m.no}</div>`;
+  }).join('');
+  
+  const html = `
+    <div class="modal-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3M16 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-3"/></svg>
+      Masa Değiştir — Masa ${masa.no}
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:14px">Taşınacak masayı seçin (gri = açık, seçilemez):</div>
+    <div class="masa-degistir-grid">${btns}</div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="closeModal()">İptal</button>
+    </div>
+  `;
+  showModal(html);
+}
+
+function masaDegistir(fromId, toId) {
+  const from = state.masalar.find(m => m.id === fromId);
+  const to = state.masalar.find(m => m.id === toId);
+  if (!from || !to || to.acik) return;
+  
+  // Swap data
+  const data = { acik: from.acik, tip: from.tip, kol: from.kol, acilis: from.acilis, sure: from.sure, adisyonlar: from.adisyonlar };
+  from.acik = false; from.tip = null; from.kol = 2; from.acilis = null; from.sure = null; from.adisyonlar = [];
+  to.acik = data.acik; to.tip = data.tip; to.kol = data.kol; to.acilis = data.acilis; to.sure = data.sure; to.adisyonlar = data.adisyonlar;
+  
+  addLog('move', `Masa ${from.no} → Masa ${to.no} taşındı`, toId);
+  saveState();
+  closeModal();
+  renderMasaGrid();
+  showToast(`Masa ${from.no} → Masa ${to.no} taşındı`, 'info');
+}
+
+// ============================================================
+// SÜRELİ ÇEVİR
+// ============================================================
+function sureliCevir(masaId) {
+  closeContextMenu();
+  const masa = state.masalar.find(m => m.id === masaId);
+  if (!masa.acik) return;
+  
+  if (masa.tip === 'suresiz') {
+    // Süreli'ye çevir
+    const html = `
+      <div class="modal-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        Süreli Çevir — Masa ${masa.no}
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Süre Seç</label>
+        <div class="sure-options" id="sure-options">
+          <div class="sure-opt selected" data-sure="30" onclick="selectSure(this)">30 dk</div>
+          <div class="sure-opt" data-sure="60" onclick="selectSure(this)">1 saat</div>
+          <div class="sure-opt" data-sure="90" onclick="selectSure(this)">1.5 saat</div>
+          <div class="sure-opt" data-sure="120" onclick="selectSure(this)">2 saat</div>
+          <div class="sure-opt" data-sure="180" onclick="selectSure(this)">3 saat</div>
+          <div class="sure-opt" data-sure="240" onclick="selectSure(this)">4 saat</div>
+        </div>
+        <input type="number" class="form-input" id="sure-custom" placeholder="Özel süre (dakika)" min="1" style="margin-top:8px">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="closeModal()">İptal</button>
+        <button class="btn btn-primary" onclick="sureliCevirOnay(${masaId})">Çevir</button>
+      </div>
+    `;
+    showModal(html);
+  } else {
+    // Süresiz'e çevir
+    masa.tip = 'suresiz';
+    masa.sure = null;
+    addLog('fiyat', `Masa ${masa.no} süresiz'e çevrildi`, masaId);
+    saveState();
+    renderMasaGrid();
+    showToast(`Masa ${masa.no} süresiz'e çevrildi`, 'info');
+  }
+}
+
+function sureliCevirOnay(masaId) {
+  const masa = state.masalar.find(m => m.id === masaId);
+  const sureOptEl = document.querySelector('.sure-opt.selected');
+  const customEl = document.getElementById('sure-custom');
+  let sure = 60;
+  if (customEl && customEl.value) sure = parseInt(customEl.value);
+  else if (sureOptEl) sure = parseInt(sureOptEl.dataset.sure);
+  
+  masa.tip = 'sureli';
+  masa.sure = sure;
+  addLog('fiyat', `Masa ${masa.no} süreli'ye çevrildi (${sure} dk)`, masaId);
+  saveState();
+  closeModal();
+  renderMasaGrid();
+  showToast(`Masa ${masa.no} süreli'ye çevrildi`, 'info');
+}
+
+// ============================================================
+// MASA EKLE
+// ============================================================
+function openMasaEkleModal() {
+  const html = `
+    <div class="modal-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent2)" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      Yeni Masa Ekle
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Masa Adedi</label>
+      <input type="number" class="form-input" id="masa-ekle-adet" value="1" min="1" max="20">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="closeModal()">İptal</button>
+      <button class="btn btn-primary" onclick="masaEkleOnay()">Ekle</button>
+    </div>
+  `;
+  showModal(html);
+}
+
+function masaEkleOnay() {
+  const adet = parseInt(document.getElementById('masa-ekle-adet').value) || 1;
+  const maxNo = state.masalar.reduce((m, x) => Math.max(m, x.no), 0);
+  for (let i = 1; i <= adet; i++) {
+    const no = maxNo + i;
+    state.masalar.push(createMasa(no));
+    state.fiyatlar[no] = { 1: { saat: 100, acKapa: 100 }, 2: { saat: 170, acKapa: 170 }, 3: { saat: 250, acKapa: 250 }, 4: { saat: 320, acKapa: 320 } };
+  }
+  addLog('fiyat', `${adet} yeni masa eklendi`, null);
+  saveState();
+  closeModal();
+  renderMasaGrid();
+  renderFiyatlar();
+  showToast(`${adet} masa eklendi`, 'success');
+}
+
+// ============================================================
+// MASA DETAY
+// ============================================================
+function showMasaDetail(masaId) {
+  // Context menu yeterli, detay modalı açmaya gerek yok
+}
+
+// ============================================================
+// FİYATLAR
+// ============================================================
+function renderFiyatlar() {
+  const grid = document.getElementById('fiyat-masa-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  state.masalar.forEach(m => {
+    const f = state.fiyatlar[m.id] || { 1:{saat:100,acKapa:100}, 2:{saat:170,acKapa:170}, 3:{saat:250,acKapa:250}, 4:{saat:320,acKapa:320} };
+    const card = document.createElement('div');
+    card.className = 'fiyat-card';
+    card.innerHTML = `
+      <div class="fiyat-card-header">
+        <div class="fiyat-card-title">Masa ${m.no}</div>
+        ${m.acik ? `<div class="masa-status-badge badge-acik" style="margin-bottom:0">Açık</div>` : ''}
+      </div>
+      <div class="fiyat-card-body">
+        <div style="display:grid;grid-template-columns:70px 1fr 1fr;gap:6px;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">
+          <span></span>
+          <span style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;text-align:center">Saat Ücreti</span>
+          <span style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;text-align:center">Aç/Kapa</span>
+        </div>
+        ${[1,2,3,4].map(k => {
+          const kf = (typeof f[k] === 'number') ? { saat: f[k], acKapa: f[k] } : (f[k] || {saat:0,acKapa:0});
+          return `
+          <div style="display:grid;grid-template-columns:70px 1fr 1fr;gap:6px;align-items:center;margin-bottom:8px">
+            <span style="font-size:12px;font-weight:600;color:var(--text2)">${k} Kol</span>
+            <div style="position:relative">
+              <input type="number" class="fiyat-input" id="f-${m.id}-${k}-saat" value="${kf.saat}" min="0" step="1" style="padding-right:28px">
+              <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--text3)">₺</span>
+            </div>
+            <div style="position:relative">
+              <input type="number" class="fiyat-input" id="f-${m.id}-${k}-acKapa" value="${kf.acKapa}" min="0" step="1" style="padding-right:28px">
+              <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--text3)">₺</span>
+            </div>
+          </div>
+        `}).join('')}
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px;padding:6px 8px;background:var(--bg4);border-radius:6px;line-height:1.5">
+          <b style="color:var(--text2)">Saat Ücreti:</b> Saatlik oyun ücreti (dk bazlı uzar)<br>
+          <b style="color:var(--text2)">Aç/Kapa:</b> Minimum ücret — erken kapansa bile alınır
+        </div>
+        <button class="save-btn" onclick="saveFiyat(${m.id})">Kaydet</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function saveFiyat(masaId) {
+  if (!state.fiyatlar[masaId]) state.fiyatlar[masaId] = {};
+  [1,2,3,4].forEach(k => {
+    const saatEl = document.getElementById(`f-${masaId}-${k}-saat`);
+    const acKapaEl = document.getElementById(`f-${masaId}-${k}-acKapa`);
+    state.fiyatlar[masaId][k] = {
+      saat: parseFloat(saatEl ? saatEl.value : 0) || 0,
+      acKapa: parseFloat(acKapaEl ? acKapaEl.value : 0) || 0
+    };
+  });
+  addLog('fiyat', `Masa ${masaId} fiyatları güncellendi`, masaId);
+  saveState();
+  renderMasaGrid();
+  showToast(`Masa ${masaId} fiyatları kaydedildi`, 'success');
+}
+
+// ============================================================
+// ADİSYON MENÜ
+// ============================================================
+function renderAdisyonList() {
+  const list = document.getElementById('adisyon-list');
+  if (!list) return;
+  if (state.adisyonlar.length === 0) {
+    list.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px">Henüz ürün eklenmedi</div>';
+    return;
+  }
+  list.innerHTML = state.adisyonlar.map(a => `
+    <div class="adisyon-item">
+      <span class="adisyon-item-name">${a.isim}</span>
+      <span class="adisyon-item-price">${formatMoney(a.fiyat)}</span>
+      <button class="adisyon-item-del" onclick="adisyonSil('${a.id}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+function adisyonEkle() {
+  const isim = document.getElementById('adisyon-isim').value.trim();
+  const fiyat = parseFloat(document.getElementById('adisyon-fiyat').value);
+  if (!isim) { showToast('Ürün adı girin', 'error'); return; }
+  if (isNaN(fiyat) || fiyat < 0) { showToast('Geçerli fiyat girin', 'error'); return; }
+  state.adisyonlar.push({ id: 'a' + Date.now(), isim, fiyat });
+  addLog('adisyon', `Adisyon menüsüne eklendi: ${isim} — ${formatMoney(fiyat)}`, null);
+  saveState();
+  document.getElementById('adisyon-isim').value = '';
+  document.getElementById('adisyon-fiyat').value = '';
+  renderAdisyonList();
+  showToast(`${isim} menüye eklendi`, 'success');
+}
+
+function adisyonSil(id) {
+  const a = state.adisyonlar.find(x => x.id === id);
+  if (a) addLog('adisyon', `Adisyon menüsünden silindi: ${a.isim}`, null);
+  state.adisyonlar = state.adisyonlar.filter(x => x.id !== id);
+  saveState();
+  renderAdisyonList();
+}
+
+// ============================================================
+// KASA
+// ============================================================
+function renderKasa() {
+  // Anlık
+  const acikMasalar = state.masalar.filter(m => m.acik);
+  const anlik = acikMasalar.reduce((s, m) => s + calcToplam(m), 0);
+  
+  const el1 = document.getElementById('kasa-anlik-val');
+  const el2 = document.getElementById('kasa-anlik-sub');
+  const el3 = document.getElementById('kasa-gunluk-val');
+  const el4 = document.getElementById('kasa-gunluk-sub');
+  
+  if (el1) el1.textContent = formatMoney(anlik);
+  if (el2) el2.textContent = `${acikMasalar.length} masa açık`;
+  if (el3) el3.textContent = formatMoney(state.gunlukKasa);
+  if (el4) el4.textContent = `${state.gunlukIslemler.length} hesap kesildi`;
+  
+  const tbody = document.getElementById('kasa-table-body');
+  if (!tbody) return;
+  if (state.gunlukIslemler.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text3); padding:24px">Bugün henüz hesap kesilmedi</td></tr>';
+    return;
+  }
+  tbody.innerHTML = [...state.gunlukIslemler].reverse().map(i => `
+    <tr>
+      <td>${formatDateTime(i.ts)}</td>
+      <td>Masa ${i.masaNo}</td>
+      <td>${i.sure}</td>
+      <td>${i.kol} Kol</td>
+      <td>${i.tip}${i.adisyonlar && i.adisyonlar.length > 0 ? ' + ' + i.adisyonlar.map(a=>a.isim).join(', ') : ''}</td>
+      <td class="amount">${formatMoney(i.toplam)}</td>
+    </tr>
+  `).join('');
+}
+
+function updateKasaHeader() {
+  const acikMasalar = state.masalar.filter(m => m.acik);
+  const anlik = acikMasalar.reduce((s, m) => s + calcToplam(m), 0);
+  
+  const h1 = document.getElementById('header-anlik');
+  const h2 = document.getElementById('header-gunluk');
+  const h3 = document.getElementById('acik-masa-count');
+  if (h1) h1.textContent = formatMoney(anlik);
+  if (h2) h2.textContent = formatMoney(state.gunlukKasa);
+  if (h3) h3.textContent = acikMasalar.length;
+}
+
+// ============================================================
+// LOG
+// ============================================================
+const logTypes = {
+  open: { label: 'Açılış', color: 'var(--green)', bg: 'var(--green-dim)', icon: '▶' },
+  close: { label: 'Kapanış', color: 'var(--yellow)', bg: 'var(--yellow-dim)', icon: '■' },
+  free: { label: 'Ücretsiz', color: 'var(--text3)', bg: 'var(--bg4)', icon: '○' },
+  adisyon: { label: 'Adisyon', color: 'var(--accent2)', bg: 'var(--bg4)', icon: '+' },
+  fiyat: { label: 'Ayar', color: 'var(--purple)', bg: 'var(--purple-dim)', icon: '✎' },
+  move: { label: 'Taşıma', color: 'var(--yellow)', bg: 'var(--yellow-dim)', icon: '→' },
+};
+
+let logFilter = 'all';
+
+function addLog(type, text, masaId) {
+  state.log.unshift({ type, text, masaId, ts: Date.now() });
+  if (state.log.length > 500) state.log = state.log.slice(0, 500);
+  if (document.getElementById('page-log').classList.contains('active')) renderLog();
+}
+
+function renderLog() {
+  const list = document.getElementById('log-list');
+  if (!list) return;
+  const filtered = logFilter === 'all' ? state.log : state.log.filter(l => l.type === logFilter);
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty-state"><h3>Log kaydı yok</h3><p>Bu kategoride kayıt bulunmuyor.</p></div>';
+    return;
+  }
+  list.innerHTML = filtered.map(l => {
+    const t = logTypes[l.type] || logTypes.fiyat;
+    return `
+      <div class="log-item">
+        <div class="log-icon" style="background:${t.bg};color:${t.color};font-weight:700">${t.icon}</div>
+        <div class="log-body">
+          <div class="log-text">${l.text}</div>
+          <div class="log-time">${new Date(l.ts).toLocaleString('tr-TR')}</div>
+        </div>
+        ${l.masaId ? `<div class="log-masa-badge">M${l.masaId}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function filterLog(type, btn) {
+  logFilter = type;
+  document.querySelectorAll('.log-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLog();
+}
+
+function clearLog() {
+  if (confirm('Tüm log kayıtları silinecek. Emin misiniz?')) {
+    state.log = [];
+    saveState();
+    renderLog();
+    showToast('Log temizlendi', 'info');
+  }
+}
+
+// ============================================================
+// PAGE NAVIGATION
+// ============================================================
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  
+  const navBtns = document.querySelectorAll('.nav-btn');
+  navBtns.forEach(b => {
+    if (b.textContent.trim().toLowerCase().includes(
+      page === 'masalar' ? 'masa' : page === 'fiyatlar' ? 'fiyat' : page === 'adisyon' ? 'adisyon' : page === 'kasa' ? 'kasa' : 'log'
+    )) b.classList.add('active');
+  });
+  
+  state.currentPage = page;
+  if (page === 'masalar') renderMasaGrid();
+  if (page === 'fiyatlar') renderFiyatlar();
+  if (page === 'adisyon') renderAdisyonList();
+  if (page === 'kasa') renderKasa();
+  if (page === 'log') renderLog();
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function showModal(html) {
+  closeModal();
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'modal-overlay';
+  overlay.innerHTML = `<div class="modal">${html}</div>`;
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeModal();
+  });
+  document.getElementById('modals').appendChild(overlay);
+}
+
+function closeModal() {
+  const m = document.getElementById('modal-overlay');
+  if (m) m.remove();
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  const icons = { success: '✓', error: '✕', info: 'ℹ' };
+  toast.innerHTML = `<span style="font-size:16px">${icons[type] || 'ℹ'}</span> ${msg}`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// ============================================================
+// KEYBOARD
+// ============================================================
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeContextMenu(); }
+});
+
+// ============================================================
+// TICK - Her saniye açık masaları güncelle
+// ============================================================
+setInterval(() => {
+  if (state.currentPage === 'masalar') renderMasaGrid();
+  updateKasaHeader();
+  if (state.currentPage === 'kasa') renderKasa();
+}, 1000);
+
+// ============================================================
+// INIT
+// ============================================================
+loadState();
+renderMasaGrid();
+renderFiyatlar();
+renderAdisyonList();
+updateKasaHeader();
+startTimer();
+
+// Gece yarısı günlük kasa sıfırlama
+function checkMidnight() {
+  const now = new Date();
+  const lastReset = localStorage.getItem('pscafe_last_reset');
+  const today = now.toDateString();
+  if (lastReset !== today) {
+    // Yeni gün
+    if (lastReset) {
+      state.gunlukKasa = 0;
+      state.gunlukIslemler = [];
+      addLog('fiyat', 'Günlük kasa sıfırlandı (yeni gün)', null);
+      saveState();
+    }
+    localStorage.setItem('pscafe_last_reset', today);
+  }
+}
+checkMidnight();
+setInterval(checkMidnight, 60000);
+</script>
+</body>
+</html>
